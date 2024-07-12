@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  react-app:
+    deploy:
+      restart_policy:
+        condition: on-failure
+    container_name: react-calculator-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DEBUG_MODE=true  # Ova opcija omogućava debug mode
+    volumes:
+      - .:/app
+      - data-volume:/data  # Definicija volumena 'data-volume' za trajno skladištenje podataka
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+volumes:
+  data-volume:  # Definicija volumena 'data-volume'
+    driver: local  # Koristimo local driver za jednostavno lokalno skladištenje
+
+networks:
+  frontend:
+    driver: bridge
